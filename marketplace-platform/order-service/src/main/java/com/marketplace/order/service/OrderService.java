@@ -7,6 +7,8 @@ import com.marketplace.order.model.Order;
 import com.marketplace.order.model.OrderItem;
 import com.marketplace.order.model.OrderStatus;
 import com.marketplace.order.repository.OrderRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,8 @@ import java.util.UUID;
 
 @Service
 public class OrderService {
+
+    private static final Logger log = LoggerFactory.getLogger(OrderService.class);
 
     private final OrderRepository orderRepository;
     private final InventoryGrpcClient inventoryClient;
@@ -78,6 +82,14 @@ public class OrderService {
         saved.getItems().size();
         eventProducer.publishOrderCancelled(saved);
         return saved;
+    }
+
+    @Transactional
+    public void updateOrderStatus(UUID orderId, OrderStatus status) {
+        orderRepository.findById(orderId).ifPresent(order -> {
+            order.setStatus(status);
+            orderRepository.save(order);
+        });
     }
 
     public static class OrderNotFoundException extends RuntimeException {
