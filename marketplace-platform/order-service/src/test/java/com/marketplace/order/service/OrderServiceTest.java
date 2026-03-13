@@ -3,6 +3,7 @@ package com.marketplace.order.service;
 import com.marketplace.order.dto.CreateOrderRequest;
 import com.marketplace.order.dto.OrderItemRequest;
 import com.marketplace.order.grpc.InventoryGrpcClient;
+import com.marketplace.order.kafka.OrderEventProducer;
 import com.marketplace.order.model.Order;
 import com.marketplace.order.model.OrderStatus;
 import com.marketplace.order.repository.OrderRepository;
@@ -30,6 +31,9 @@ class OrderServiceTest {
 
     @Mock
     private InventoryGrpcClient inventoryClient;
+
+    @Mock
+    private OrderEventProducer eventProducer;
 
     @InjectMocks
     private OrderService orderService;

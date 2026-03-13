@@ -2,6 +2,7 @@ package com.marketplace.order.service;
 
 import com.marketplace.order.dto.CreateOrderRequest;
 import com.marketplace.order.grpc.InventoryGrpcClient;
+import com.marketplace.order.kafka.OrderEventProducer;
 import com.marketplace.order.model.Order;
 import com.marketplace.order.model.OrderItem;
 import com.marketplace.order.model.OrderStatus;
@@ -17,10 +18,12 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final InventoryGrpcClient inventoryClient;
+    private final OrderEventProducer eventProducer;
 
-    public OrderService(OrderRepository orderRepository, InventoryGrpcClient inventoryClient) {
+    public OrderService(OrderRepository orderRepository, InventoryGrpcClient inventoryClient, OrderEventProducer eventProducer) {
         this.orderRepository = orderRepository;
         this.inventoryClient = inventoryClient;
+        this.eventProducer = eventProducer;
     }
 
     @Transactional
@@ -42,6 +45,8 @@ public class OrderService {
         for (var item : request.items()) {
             inventoryClient.reserveStock(item.productId(), item.quantity(), saved.getId().toString());
         }
+
+        eventProducer.publishOrderPlaced(saved);
 
         return saved;
     }
@@ -71,6 +76,7 @@ public class OrderService {
         Order saved = orderRepository.save(order);
         // Force initialization of items within the transaction
         saved.getItems().size();
+        eventProducer.publishOrderCancelled(saved);
         return saved;
     }
 
