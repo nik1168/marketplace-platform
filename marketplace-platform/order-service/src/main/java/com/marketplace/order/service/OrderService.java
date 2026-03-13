@@ -7,6 +7,8 @@ import com.marketplace.order.model.Order;
 import com.marketplace.order.model.OrderItem;
 import com.marketplace.order.model.OrderStatus;
 import com.marketplace.order.repository.OrderRepository;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -14,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class OrderService {
@@ -23,36 +26,53 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final InventoryGrpcClient inventoryClient;
     private final OrderEventProducer eventProducer;
+    private final Counter ordersCreatedCounter;
+    private final Counter ordersRejectedCounter;
+    private final Timer orderCreationTimer;
 
-    public OrderService(OrderRepository orderRepository, InventoryGrpcClient inventoryClient, OrderEventProducer eventProducer) {
+    public OrderService(OrderRepository orderRepository, InventoryGrpcClient inventoryClient,
+                        OrderEventProducer eventProducer, Counter ordersCreatedCounter,
+                        Counter ordersRejectedCounter, Timer orderCreationTimer) {
         this.orderRepository = orderRepository;
         this.inventoryClient = inventoryClient;
         this.eventProducer = eventProducer;
+        this.ordersCreatedCounter = ordersCreatedCounter;
+        this.ordersRejectedCounter = ordersRejectedCounter;
+        this.orderCreationTimer = orderCreationTimer;
     }
 
     @Transactional
     public Order createOrder(CreateOrderRequest request) {
-        // Check stock for all items via gRPC
-        for (var item : request.items()) {
-            if (!inventoryClient.checkStock(item.productId(), item.quantity())) {
-                throw new InsufficientStockException(item.productId());
+        long start = System.nanoTime();
+        try {
+            // Check stock for all items via gRPC
+            for (var item : request.items()) {
+                if (!inventoryClient.checkStock(item.productId(), item.quantity())) {
+                    throw new InsufficientStockException(item.productId());
+                }
             }
+
+            Order order = new Order(request.customerId());
+            request.items().forEach(item ->
+                    order.addItem(new OrderItem(item.productId(), item.quantity(), item.unitPrice()))
+            );
+            Order saved = orderRepository.save(order);
+
+            // Reserve stock for all items
+            for (var item : request.items()) {
+                inventoryClient.reserveStock(item.productId(), item.quantity(), saved.getId().toString());
+            }
+
+            eventProducer.publishOrderPlaced(saved);
+
+            ordersCreatedCounter.increment();
+            return saved;
+        } catch (InsufficientStockException e) {
+            ordersRejectedCounter.increment();
+            throw e;
+        } finally {
+            orderCreationTimer.record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
-
-        Order order = new Order(request.customerId());
-        request.items().forEach(item ->
-                order.addItem(new OrderItem(item.productId(), item.quantity(), item.unitPrice()))
-        );
-        Order saved = orderRepository.save(order);
-
-        // Reserve stock for all items
-        for (var item : request.items()) {
-            inventoryClient.reserveStock(item.productId(), item.quantity(), saved.getId().toString());
-        }
-
-        eventProducer.publishOrderPlaced(saved);
-
-        return saved;
     }
 
     @Transactional(readOnly = true)

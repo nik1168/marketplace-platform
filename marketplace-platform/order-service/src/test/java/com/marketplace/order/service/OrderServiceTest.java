@@ -7,6 +7,8 @@ import com.marketplace.order.kafka.OrderEventProducer;
 import com.marketplace.order.model.Order;
 import com.marketplace.order.model.OrderStatus;
 import com.marketplace.order.repository.OrderRepository;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Timer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -34,6 +36,15 @@ class OrderServiceTest {
 
     @Mock
     private OrderEventProducer eventProducer;
+
+    @Mock
+    private Counter ordersCreatedCounter;
+
+    @Mock
+    private Counter ordersRejectedCounter;
+
+    @Mock
+    private Timer orderCreationTimer;
 
     @InjectMocks
     private OrderService orderService;
