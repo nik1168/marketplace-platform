@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: inventory-service
+  threads:
+    virtual:
+      enabled: true
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/inventory_db
+  kafka:
+    bootstrap-servers: localhost:29092
+    consumer:
+      group-id: inventory-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.marketplace.*"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+server:
+  port: 8081
+
+grpc:
+  server:
+    port: 9090
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
