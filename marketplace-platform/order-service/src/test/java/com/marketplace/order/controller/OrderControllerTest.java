@@ -3,6 +3,7 @@ package com.marketplace.order.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marketplace.order.dto.CreateOrderRequest;
 import com.marketplace.order.dto.OrderItemRequest;
+import com.marketplace.order.grpc.InventoryGrpcClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -10,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -20,6 +22,8 @@ import org.testcontainers.kafka.KafkaContainer;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -48,8 +52,14 @@ class OrderControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @MockBean
+    private InventoryGrpcClient inventoryClient;
+
     @Test
     void shouldCreateOrder() throws Exception {
+        when(inventoryClient.checkStock(anyString(), anyInt())).thenReturn(true);
+        when(inventoryClient.reserveStock(anyString(), anyInt(), anyString())).thenReturn(true);
+
         var request = new CreateOrderRequest("customer-1", List.of(
                 new OrderItemRequest("product-1", 2, new BigDecimal("29.99"))
         ));
@@ -72,6 +82,9 @@ class OrderControllerTest {
 
     @Test
     void shouldCancelOrder() throws Exception {
+        when(inventoryClient.checkStock(anyString(), anyInt())).thenReturn(true);
+        when(inventoryClient.reserveStock(anyString(), anyInt(), anyString())).thenReturn(true);
+
         var request = new CreateOrderRequest("customer-1", List.of(
                 new OrderItemRequest("product-1", 1, new BigDecimal("10.00"))
         ));

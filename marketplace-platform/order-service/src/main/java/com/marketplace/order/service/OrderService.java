@@ -1,6 +1,7 @@
 package com.marketplace.order.service;
 
 import com.marketplace.order.dto.CreateOrderRequest;
+import com.marketplace.order.grpc.InventoryGrpcClient;
 import com.marketplace.order.model.Order;
 import com.marketplace.order.model.OrderItem;
 import com.marketplace.order.model.OrderStatus;
@@ -15,18 +16,34 @@ import java.util.UUID;
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final InventoryGrpcClient inventoryClient;
 
-    public OrderService(OrderRepository orderRepository) {
+    public OrderService(OrderRepository orderRepository, InventoryGrpcClient inventoryClient) {
         this.orderRepository = orderRepository;
+        this.inventoryClient = inventoryClient;
     }
 
     @Transactional
     public Order createOrder(CreateOrderRequest request) {
+        // Check stock for all items via gRPC
+        for (var item : request.items()) {
+            if (!inventoryClient.checkStock(item.productId(), item.quantity())) {
+                throw new InsufficientStockException(item.productId());
+            }
+        }
+
         Order order = new Order(request.customerId());
         request.items().forEach(item ->
                 order.addItem(new OrderItem(item.productId(), item.quantity(), item.unitPrice()))
         );
-        return orderRepository.save(order);
+        Order saved = orderRepository.save(order);
+
+        // Reserve stock for all items
+        for (var item : request.items()) {
+            inventoryClient.reserveStock(item.productId(), item.quantity(), saved.getId().toString());
+        }
+
+        return saved;
     }
 
     @Transactional(readOnly = true)
@@ -60,6 +77,12 @@ public class OrderService {
     public static class OrderNotFoundException extends RuntimeException {
         public OrderNotFoundException(UUID id) {
             super("Order not found: " + id);
+        }
+    }
+
+    public static class InsufficientStockException extends RuntimeException {
+        public InsufficientStockException(String productId) {
+            super("Insufficient stock for product: " + productId);
         }
     }
 }

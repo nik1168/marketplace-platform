@@ -48,6 +48,11 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
+    @ExceptionHandler(OrderService.InsufficientStockException.class)
+    public ResponseEntity<String> handleInsufficientStock(OrderService.InsufficientStockException ex) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(ex.getMessage());
+    }
+
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<String> handleIllegalState(IllegalStateException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
