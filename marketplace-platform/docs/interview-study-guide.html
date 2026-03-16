@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interview Study Guide — AssureSoft Senior SWE</title>
+<style>
+  :root {
+    --primary: #1565c0;
+    --primary-light: #e3f2fd;
+    --green: #2e7d32;
+    --green-light: #e8f5e9;
+    --orange: #ef6c00;
+    --orange-light: #fff3e0;
+    --red: #c62828;
+    --red-light: #ffebee;
+    --purple: #6a1b9a;
+    --purple-light: #f3e5f5;
+    --pink-light: #fce4ec;
+    --grey: #546e7a;
+    --grey-light: #f5f5f5;
+    --bg: #fafafa;
+    --card-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: #333;
+    line-height: 1.6;
+  }
+
+  /* Navigation */
+  .top-nav {
+    background: var(--primary);
+    color: white;
+    padding: 16px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  .top-nav h1 { font-size: 20px; font-weight: 600; }
+  .top-nav p { font-size: 13px; opacity: 0.85; margin-top: 2px; }
+
+  .tab-bar {
+    display: flex;
+    gap: 0;
+    background: #0d47a1;
+    padding: 0 24px;
+    position: sticky;
+    top: 68px;
+    z-index: 99;
+  }
+  .tab-btn {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.7);
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+  }
+  .tab-btn:hover { color: white; background: rgba(255,255,255,0.08); }
+  .tab-btn.active { color: white; border-bottom-color: white; }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 24px; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* Summary Cards */
+  .tech-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+  @media (max-width: 700px) { .tech-grid { grid-template-columns: 1fr; } }
+
+  .tech-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: var(--card-shadow);
+    border-left: 4px solid var(--primary);
+    transition: transform 0.15s;
+  }
+  .tech-card:hover { transform: translateY(-2px); }
+  .tech-card h3 { font-size: 16px; margin-bottom: 4px; }
+  .tech-card .subtitle { font-size: 12px; color: var(--grey); margin-bottom: 10px; }
+  .tech-card p { font-size: 14px; margin-bottom: 8px; }
+  .tech-card .tag {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-right: 4px;
+    margin-top: 4px;
+    font-weight: 500;
+  }
+  .tag-file { background: var(--primary-light); color: var(--primary); }
+  .tag-concept { background: var(--green-light); color: var(--green); }
+
+  .tech-card.grpc { border-left-color: var(--purple); }
+  .tech-card.kafka { border-left-color: #d81b60; }
+  .tech-card.vt { border-left-color: var(--green); }
+  .tech-card.pg { border-left-color: var(--orange); }
+  .tech-card.mongo { border-left-color: #00838f; }
+  .tech-card.rest { border-left-color: var(--primary); }
+  .tech-card.obs { border-left-color: #6a1b9a; }
+  .tech-card.micro { border-left-color: #37474f; }
+  .tech-card.test { border-left-color: #ad1457; }
+  .tech-card.docker { border-left-color: #0277bd; }
+  .tech-card.speckit { border-left-color: #00897b; }
+
+  /* Flashcards */
+  .flashcard-controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1.5px solid #ddd;
+    background: white;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .filter-btn:hover { border-color: var(--primary); color: var(--primary); }
+  .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+  .flashcard-container {
+    perspective: 1000px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .flashcard {
+    width: 100%;
+    min-height: 260px;
+    cursor: pointer;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.5s;
+  }
+  .flashcard.flipped { transform: rotateY(180deg); }
+  .flashcard-face {
+    position: absolute;
+    width: 100%;
+    min-height: 260px;
+    backface-visibility: hidden;
+    border-radius: 16px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    box-shadow: var(--card-shadow);
+  }
+  .flashcard-front {
+    background: white;
+    border: 2px solid #e0e0e0;
+  }
+  .flashcard-front h3 { font-size: 18px; line-height: 1.5; }
+  .flashcard-front .hint { font-size: 12px; color: #999; margin-top: 16px; }
+  .flashcard-back {
+    background: var(--green-light);
+    border: 2px solid #a5d6a7;
+    transform: rotateY(180deg);
+  }
+  .flashcard-back p { font-size: 15px; line-height: 1.6; }
+  .flashcard-back .project-note {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: white;
+    border-radius: 8px;
+    font-size: 13px;
+    text-align: left;
+    width: 100%;
+  }
+  .flashcard-back .project-note strong { color: var(--primary); }
+
+  .flashcard-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 20px;
+  }
+  .nav-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid #ddd;
+    background: white;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+  .nav-btn:hover { border-color: var(--primary); color: var(--primary); }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+  .card-counter { font-size: 14px; color: var(--grey); min-width: 80px; text-align: center; }
+
+  .fc-category {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Quiz */
+  .quiz-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--card-shadow);
+  }
+  .quiz-card h3 {
+    font-size: 15px;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .quiz-card .q-number {
+    background: var(--primary);
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+  .quiz-card p.question { font-size: 15px; margin-bottom: 14px; font-weight: 500; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt {
+    padding: 12px 16px;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.15s;
+    background: white;
+    text-align: left;
+    width: 100%;
+  }
+  .quiz-opt:hover:not(.selected):not(.correct):not(.wrong) {
+    border-color: var(--primary);
+    background: var(--primary-light);
+  }
+  .quiz-opt.correct { border-color: var(--green); background: var(--green-light); }
+  .quiz-opt.wrong { border-color: var(--red); background: var(--red-light); }
+  .quiz-opt.selected { font-weight: 600; }
+  .quiz-explanation {
+    margin-top: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+    display: none;
+  }
+  .quiz-explanation.show { display: block; }
+  .quiz-explanation.correct-exp { background: var(--green-light); border: 1px solid #a5d6a7; }
+  .quiz-explanation.wrong-exp { background: var(--red-light); border: 1px solid #ef9a9a; }
+
+  .quiz-score {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 16px;
+  }
+  .quiz-score .score-number { font-size: 48px; font-weight: 700; color: var(--primary); }
+  .quiz-score .score-label { font-size: 14px; color: var(--grey); }
+
+  .quiz-filter {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .reset-btn {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 8px 20px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .reset-btn:hover { background: #0d47a1; }
+
+  .section-title { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+  .section-subtitle { font-size: 14px; color: var(--grey); margin-bottom: 20px; }
+
+  .shuffle-btn {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--orange);
+    background: var(--orange-light);
+    color: var(--orange);
+    font-size: 13px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  .shuffle-btn:hover { background: var(--orange); color: white; }
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <h1>Interview Study Guide</h1>
+  <p>AssureSoft — Senior Software Engineer (AI-First Development)</p>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="showSection('summaries')">Tech Summaries</button>
+  <button class="tab-btn" onclick="showSection('flashcards')">Flashcards</button>
+  <button class="tab-btn" onclick="showSection('quiz')">Quiz</button>
+</div>
+
+<!-- ============ SUMMARIES ============ -->
+<div id="summaries" class="section active">
+<div class="container">
+  <h2 class="section-title">Technology Summaries</h2>
+  <p class="section-subtitle">Quick reference for every technology used in the Marketplace Platform</p>
+
+  <div class="tech-grid">
+
+    <div class="tech-card vt">
+      <h3>Java 21 Virtual Threads</h3>
+      <div class="subtitle">Concurrency without complexity</div>
+      <p>Lightweight threads managed by the JVM (~1KB each vs ~1MB for platform threads). When a virtual thread hits a blocking call (gRPC, DB, Kafka), it <strong>parks</strong> and frees the carrier thread for other work. Enables thousands of concurrent requests with no code changes.</p>
+      <p><strong>Key insight:</strong> Write normal blocking code, get non-blocking performance. No reactive programming needed.</p>
+      <span class="tag tag-file">application.yml:5</span>
+      <span class="tag tag-concept">spring.threads.virtual.enabled: true</span>
+    </div>
+
+    <div class="tech-card kafka">
+      <h3>Apache Kafka</h3>
+      <div class="subtitle">Async messaging between services</div>
+      <p>A distributed message broker. Services drop messages into <strong>topics</strong> (named mailboxes). Other services pick them up when ready. Messages are stored on disk — if a consumer is down, messages wait and are never lost.</p>
+      <p><strong>Our topics:</strong> <code>order-events</code> (3 partitions) and <code>inventory-events</code> (3 partitions). Uses orderId as key for partition routing.</p>
+      <span class="tag tag-file">OrderEventProducer.java</span>
+      <span class="tag tag-file">InventoryEventConsumer.java</span>
+      <span class="tag tag-concept">KRaft mode (no Zookeeper)</span>
+    </div>
+
+    <div class="tech-card grpc">
+      <h3>gRPC</h3>
+      <div class="subtitle">Fast service-to-service calls</div>
+      <p>Binary protocol over HTTP/2 for synchronous calls between services. A <code>.proto</code> file defines the contract — both services generate Java code from it. ~10x smaller payloads than JSON. Used when the caller needs an answer <strong>right now</strong>.</p>
+      <p><strong>Our RPCs:</strong> CheckStock and ReserveStock, defined in <code>inventory.proto</code>.</p>
+      <span class="tag tag-file">inventory.proto</span>
+      <span class="tag tag-file">InventoryGrpcServer.java</span>
+      <span class="tag tag-file">InventoryGrpcClient.java</span>
+    </div>
+
+    <div class="tech-card pg">
+      <h3>PostgreSQL</h3>
+      <div class="subtitle">Relational database for orders</div>
+      <p>Stores orders and order items in tables with ACID transactions. Guarantees that an order and all its items are saved together or not at all (atomicity). Uses JPA/Hibernate for ORM with <code>@Transactional</code>.</p>
+      <p><strong>Tables:</strong> <code>orders</code> (UUID, status, total) and <code>order_items</code> (product, qty, price).</p>
+      <span class="tag tag-file">Order.java</span>
+      <span class="tag tag-file">OrderRepository.java</span>
+      <span class="tag tag-concept">@Transactional</span>
+    </div>
+
+    <div class="tech-card mongo">
+      <h3>MongoDB</h3>
+      <div class="subtitle">Document database for inventory</div>
+      <p>Stores products as self-contained JSON-like documents. No fixed schema — flexible for varying product attributes. Uses <code>@Version</code> for optimistic locking to handle concurrent stock updates safely.</p>
+      <p><strong>Collections:</strong> <code>products</code> (stock, reserved) and <code>stock_events</code> (audit trail).</p>
+      <span class="tag tag-file">Product.java</span>
+      <span class="tag tag-file">StockEvent.java</span>
+      <span class="tag tag-concept">Optimistic Locking</span>
+    </div>
+
+    <div class="tech-card rest">
+      <h3>REST APIs</h3>
+      <div class="subtitle">HTTP endpoints for clients</div>
+      <p>Standard HTTP/JSON API for external clients (frontend). Proper HTTP methods (POST, GET, PUT), status codes (201, 404, 409, 422), pagination, and Bean Validation (<code>@NotBlank</code>, <code>@Min</code>).</p>
+      <p><strong>Endpoints:</strong> POST/GET /api/orders, PUT /cancel, GET /api/products.</p>
+      <span class="tag tag-file">OrderController.java</span>
+      <span class="tag tag-file">ProductController.java</span>
+      <span class="tag tag-concept">6 endpoints total</span>
+    </div>
+
+    <div class="tech-card obs">
+      <h3>Observability</h3>
+      <div class="subtitle">Metrics, health, logging</div>
+      <p>Micrometer counters and timers track business metrics. Spring Boot Actuator exposes health checks and Prometheus-format metrics. Structured logging with SLF4J includes contextual data (orderId, productId).</p>
+      <p><strong>Metrics:</strong> orders.created.total, orders.rejected.total, orders.creation.duration.</p>
+      <span class="tag tag-file">MetricsConfig.java</span>
+      <span class="tag tag-concept">/actuator/prometheus</span>
+    </div>
+
+    <div class="tech-card micro">
+      <h3>Microservices</h3>
+      <div class="subtitle">Architecture principles</div>
+      <p>Two independently deployable services, each with its own database (polyglot persistence). Communicate via gRPC (sync) and Kafka (async). Independent event models — no shared library. Each service has its own Maven module.</p>
+      <p><strong>Services:</strong> Order Service (port 8080) + Inventory Service (port 8081/9090).</p>
+      <span class="tag tag-concept">Database per service</span>
+      <span class="tag tag-concept">Loose coupling</span>
+    </div>
+
+    <div class="tech-card test">
+      <h3>Testcontainers</h3>
+      <div class="subtitle">Real infrastructure in tests</div>
+      <p>Spins up real Docker containers (PostgreSQL, MongoDB, Kafka) for integration tests. No mocks for infrastructure — catches real bugs. Uses <code>@DynamicPropertySource</code> to inject container URLs and Awaitility for async assertions.</p>
+      <span class="tag tag-file">OrderControllerTest.java</span>
+      <span class="tag tag-file">OrderEventConsumerTest.java</span>
+      <span class="tag tag-concept">@Testcontainers</span>
+    </div>
+
+    <div class="tech-card docker">
+      <h3>Docker & Infrastructure</h3>
+      <div class="subtitle">Containerized services</div>
+      <p>Docker Compose runs PostgreSQL 16, MongoDB 7, and Kafka 3.7 (KRaft mode). KRaft eliminates Zookeeper dependency. Three containers, one <code>docker compose up</code> command.</p>
+      <span class="tag tag-file">docker-compose.yml</span>
+      <span class="tag tag-concept">KRaft = no Zookeeper</span>
+    </div>
+
+    <div class="tech-card speckit">
+      <h3>Spec Kit (AI-First Development)</h3>
+      <div class="subtitle">Spec-Driven Development with AI agents</div>
+      <p>A CLI tool for Spec-Driven Development where specifications become executable artifacts. Define a <strong>constitution</strong> (non-negotiable principles), then <strong>specify</strong> what to build and why, <strong>plan</strong> the tech stack, break into <strong>tasks</strong>, and let AI agents <strong>implement</strong>. Prevents context loss, scope creep, and inconsistent decisions across prompts.</p>
+      <p><strong>Workflow:</strong> Init → Constitution → Specify (what+why) → Plan (how) → Tasks → Implement</p>
+      <span class="tag tag-concept">20+ AI agents supported</span>
+      <span class="tag tag-concept">Spec-Driven Development</span>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ============ FLASHCARDS ============ -->
+<div id="flashcards" class="section">
+<div class="container">
+  <h2 class="section-title">Flashcards</h2>
+  <p class="section-subtitle">Click a card to flip it. Use arrows to navigate.</p>
+
+  <div class="flashcard-controls">
+    <button class="filter-btn active" data-filter="all" onclick="filterCards('all', this)">All</button>
+    <button class="filter-btn" data-filter="general" onclick="filterCards('general', this)">General</button>
+    <button class="filter-btn" data-filter="project" onclick="filterCards('project', this)">Project-Specific</button>
+    <button class="filter-btn" data-filter="kafka" onclick="filterCards('kafka', this)">Kafka</button>
+    <button class="filter-btn" data-filter="grpc" onclick="filterCards('grpc', this)">gRPC</button>
+    <button class="filter-btn" data-filter="vt" onclick="filterCards('vt', this)">Virtual Threads</button>
+    <button class="filter-btn" data-filter="db" onclick="filterCards('db', this)">Databases</button>
+    <button class="filter-btn" data-filter="micro" onclick="filterCards('micro', this)">Microservices</button>
+    <button class="filter-btn" data-filter="ai" onclick="filterCards('ai', this)">AI-First</button>
+    <button class="shuffle-btn" onclick="shuffleCards()">Shuffle</button>
+  </div>
+
+  <div class="flashcard-container">
+    <div class="flashcard" onclick="flipCard()">
+      <div class="flashcard-face flashcard-front">
+        <div class="fc-category" id="fc-category">LOADING</div>
+        <h3 id="fc-question">Loading...</h3>
+        <div class="hint">Click to reveal answer</div>
+      </div>
+      <div class="flashcard-face flashcard-back">
+        <p id="fc-answer">Loading...</p>
+        <div class="project-note" id="fc-project" style="display:none">
+          <strong>In our project:</strong> <span id="fc-project-text"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="flashcard-nav">
+    <button class="nav-btn" id="fc-prev" onclick="prevCard()">&#8592;</button>
+    <span class="card-counter" id="fc-counter">1 / 40</span>
+    <button class="nav-btn" id="fc-next" onclick="nextCard()">&#8594;</button>
+  </div>
+</div>
+</div>
+
+<!-- ============ QUIZ ============ -->
+<div id="quiz" class="section">
+<div class="container">
+  <h2 class="section-title">Quiz</h2>
+  <p class="section-subtitle">Test your knowledge. Click an answer to check it.</p>
+
+  <div class="quiz-filter">
+    <button class="filter-btn active" data-filter="all" onclick="filterQuiz('all', this)">All</button>
+    <button class="filter-btn" data-filter="general" onclick="filterQuiz('general', this)">General</button>
+    <button class="filter-btn" data-filter="project" onclick="filterQuiz('project', this)">Project-Specific</button>
+    <button class="reset-btn" onclick="resetQuiz()" style="margin-top:0;margin-left:auto">Reset All</button>
+  </div>
+
+  <div class="quiz-score">
+    <div class="score-number" id="score-display">0 / 0</div>
+    <div class="score-label">Correct Answers</div>
+  </div>
+
+  <div id="quiz-container"></div>
+</div>
+</div>
+
+<script>
+// ============ TABS ============
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ============ FLASHCARD DATA ============
+const allCards = [
+  // Virtual Threads
+  { cat: "vt", type: "general", q: "What are virtual threads in Java 21?", a: "Lightweight threads managed by the JVM (~1KB each) instead of the OS (~1MB each). They park during blocking calls, freeing the carrier thread for other work.", project: "Enabled with one line: spring.threads.virtual.enabled: true in both services." },
+  { cat: "vt", type: "general", q: "What happens when a virtual thread hits a blocking call?", a: "The virtual thread unmounts (parks) from its carrier thread, which is immediately free to run another virtual thread. When the blocking call completes, the virtual thread is scheduled on any available carrier thread.", project: "During order creation, the virtual thread parks 4 times: gRPC check, DB save, gRPC reserve, Kafka send." },
+  { cat: "vt", type: "general", q: "What's the difference between a carrier thread and a virtual thread?", a: "Carrier threads are real OS threads (limited, ~200). Virtual threads are JVM-managed and ride on carrier threads. When a VT parks, the carrier picks up another VT. Millions of VTs can share a small pool of carriers.", project: null },
+  { cat: "vt", type: "general", q: "When do virtual threads NOT help?", a: "CPU-intensive tasks (image processing, ML, calculations). The thread is actually computing, not waiting. Virtual and platform threads perform the same for CPU-bound work.", project: "Our Order Service is I/O heavy (~95% waiting), so virtual threads are ideal." },
+  { cat: "vt", type: "general", q: "How do virtual threads compare to reactive programming?", a: "Both solve the same problem (high concurrency with blocking I/O). Reactive requires a new programming model (Mono, Flux, callbacks). Virtual threads let you write normal sequential code with the same performance benefits.", project: null },
+  { cat: "vt", type: "project", q: "How are virtual threads enabled in the Marketplace Platform?", a: "spring.threads.virtual.enabled: true in application.yml of both Order Service and Inventory Service. No code changes needed — Spring Boot automatically uses virtual threads for all request handling.", project: null },
+
+  // Kafka
+  { cat: "kafka", type: "general", q: "What is a Kafka topic?", a: "A named category (mailbox) for messages. Producers write to topics, consumers read from them. Messages are stored persistently on disk.", project: "We have 2 topics: order-events (OrderPlaced, OrderCancelled) and inventory-events (StockUpdated)." },
+  { cat: "kafka", type: "general", q: "What is a Kafka partition and why does it matter?", a: "A partition is a subset of a topic. Partitions enable parallel processing (multiple consumers can read simultaneously) and guarantee message ordering within each partition.", project: "Both topics have 3 partitions. We use orderId as the message key so all events for the same order go to the same partition." },
+  { cat: "kafka", type: "general", q: "What is a consumer group in Kafka?", a: "A set of consumers that share the work of reading from a topic. Each partition is assigned to exactly one consumer in the group — no message is processed twice. Adding more consumers scales processing.", project: "inventory-service-group reads from order-events. order-service-group reads from inventory-events." },
+  { cat: "kafka", type: "general", q: "What does auto-offset-reset: earliest mean?", a: "When a consumer joins a topic for the first time (no saved offset), it starts reading from the beginning of the topic instead of only new messages. This prevents missing any messages.", project: null },
+  { cat: "kafka", type: "general", q: "What is KRaft mode in Kafka?", a: "Kafka's built-in consensus mechanism that replaces the external Zookeeper dependency. The broker handles both message storage AND cluster coordination. Simpler to operate.", project: "Our docker-compose uses KAFKA_PROCESS_ROLES: broker,controller for KRaft mode." },
+  { cat: "kafka", type: "general", q: "Why use orderId as the Kafka message key?", a: "Key-based partitioning ensures all events for the same order go to the same partition, which guarantees they're processed in order. Without this, a cancel event could be processed before a place event.", project: null },
+  { cat: "kafka", type: "project", q: "What are the 3 Kafka event types in the Marketplace Platform?", a: "OrderPlacedEvent (order created, sent by Order Service), OrderCancelledEvent (order cancelled, sent by Order Service), and StockUpdatedEvent (stock result, sent by Inventory Service).", project: null },
+  { cat: "kafka", type: "project", q: "How did we solve the Kafka deserialization type mismatch?", a: "The producer sends type headers with its own class name (e.g., com.marketplace.order.kafka.event.OrderPlacedEvent), but the consumer has a different package. We set spring.json.use.type.headers=false on @KafkaListener to ignore headers and use the local class.", project: null },
+  { cat: "kafka", type: "general", q: "What advantage does Kafka have over REST for service communication?", a: "Durability: if the consumer is down, messages queue up and are processed when it recovers. Decoupling: producers don't need to know about consumers. Scalability: partitions enable parallel processing.", project: null },
+
+  // gRPC
+  { cat: "grpc", type: "general", q: "What is a .proto file?", a: "A Protocol Buffers definition file that serves as the contract between gRPC services. It defines the service operations (RPCs) and message types. Both client and server generate code from it.", project: "proto/inventory.proto defines CheckStock and ReserveStock RPCs with their request/response messages." },
+  { cat: "grpc", type: "general", q: "Why is gRPC faster than REST?", a: "Binary serialization (Protocol Buffers) instead of text (JSON) — smaller payloads, faster parsing. HTTP/2 enables multiplexing multiple requests over a single connection. Typed contracts eliminate ambiguity.", project: null },
+  { cat: "grpc", type: "general", q: "What is a BlockingStub in gRPC?", a: "A generated client class that makes synchronous calls — the calling thread waits for the response before continuing. Simple to use like a regular method call. There's also an AsyncStub for non-blocking calls.", project: "We use BlockingStub because virtual threads make blocking calls efficient — the VT parks during the wait." },
+  { cat: "grpc", type: "general", q: "What does the responseObserver pattern in gRPC do?", a: "gRPC uses an observer pattern for responses: onNext() sends a response, onCompleted() signals the end. This supports streaming (multiple responses), though for simple RPCs you call onNext once then onCompleted.", project: null },
+  { cat: "grpc", type: "project", q: "What two gRPC operations does the Inventory Service expose?", a: "CheckStock (takes productId + quantity, returns available boolean + currentStock) and ReserveStock (takes productId + quantity + orderId, returns success boolean + message).", project: null },
+  { cat: "grpc", type: "project", q: "How does @GrpcClient work with Spring Boot?", a: "@GrpcClient('inventory-service') injects a configured BlockingStub. Spring reads the connection details from application.yml (address: static://localhost:9090) and creates the channel automatically.", project: null },
+
+  // Databases
+  { cat: "db", type: "general", q: "What is ACID in databases?", a: "Atomicity (all or nothing), Consistency (valid state), Isolation (concurrent transactions don't interfere), Durability (committed data survives crashes). PostgreSQL provides full ACID guarantees.", project: "@Transactional on createOrder ensures the order + all items are saved atomically." },
+  { cat: "db", type: "general", q: "What is optimistic locking?", a: "A concurrency control strategy using a version field. Before saving, check if the version matches what was read. If someone else changed it, the save fails and the operation retries with fresh data. No locks are held during the read.", project: "Product entity has @Version. If two stock reservations race, one gets OptimisticLockingFailureException and retries." },
+  { cat: "db", type: "general", q: "What is polyglot persistence?", a: "Using different database technologies for different services based on their needs, rather than forcing everything into one database. Each service owns its data store.", project: "Order Service uses PostgreSQL (relational, transactional). Inventory Service uses MongoDB (documents, flexible schema)." },
+  { cat: "db", type: "project", q: "Why does the Order Service use PostgreSQL instead of MongoDB?", a: "Orders require ACID transactions (save order + items atomically), relational integrity (order has many items via foreign key), and complex queries (by status, customer, date).", project: null },
+  { cat: "db", type: "project", q: "Why does the Inventory Service use MongoDB instead of PostgreSQL?", a: "Products are self-contained documents (no joins needed), MongoDB's flexible schema allows easy field additions, and high read/write throughput for stock checks.", project: null },
+  { cat: "db", type: "general", q: "What is @Transactional(readOnly = true)?", a: "Optimizes the transaction for read-only access. Hibernate skips dirty checking (comparing entities for changes) and the database can optimize for reads. Used for query methods like getOrder and listOrders.", project: null },
+  { cat: "db", type: "project", q: "What is the LazyInitializationException we encountered?", a: "JPA's @OneToMany loads items lazily (on first access). If you access items after the transaction closes, the DB session is gone. Fix: initialize items within the transaction (order.getItems().size()) or use @EntityGraph.", project: null },
+
+  // Microservices
+  { cat: "micro", type: "general", q: "What does 'database per service' mean?", a: "Each microservice owns its own database. No service directly accesses another service's database. Communication happens through APIs (REST, gRPC) or events (Kafka). This ensures loose coupling and independent deployability.", project: "Order Service owns PostgreSQL. Inventory Service owns MongoDB. They never access each other's databases." },
+  { cat: "micro", type: "general", q: "When should you use synchronous vs asynchronous communication?", a: "Synchronous (gRPC/REST): when the caller needs an immediate response. Asynchronous (Kafka): when the work can happen in the background and the caller doesn't need to wait.", project: "Sync: stock check during order placement (customer waiting). Async: order confirmation (customer already got PENDING response)." },
+  { cat: "micro", type: "general", q: "What is event-driven architecture?", a: "Services communicate by publishing and consuming events (facts about what happened) instead of direct commands. Producers don't know who consumes events. Enables loose coupling and extensibility.", project: "OrderPlacedEvent and StockUpdatedEvent drive the order confirmation flow. Adding a notification service requires zero changes to existing code." },
+  { cat: "micro", type: "project", q: "Why do both services have their own event classes instead of a shared library?", a: "To maintain loose coupling. A shared library creates a build-time dependency between services. If one service changes its event structure, it shouldn't force the other to rebuild and redeploy.", project: null },
+
+  // Observability
+  { cat: "micro", type: "general", q: "What is a Counter metric vs a Timer metric?", a: "Counter: only goes up, tracks cumulative totals (e.g., total orders created). Timer: records durations and provides stats like average, max, percentiles (e.g., order creation time). Both are exposed via Prometheus.", project: "We have 2 Counters (orders.created.total, orders.rejected.total) and 1 Timer (orders.creation.duration)." },
+
+  // Testing
+  { cat: "micro", type: "general", q: "What is Testcontainers and why use it over mocks?", a: "A library that spins up real Docker containers (databases, brokers) for tests. Catches real bugs that mocks miss — like SQL dialect issues, serialization problems, or Kafka consumer behavior.", project: "Tests use real PostgreSQL, MongoDB, and Kafka containers. Awaitility handles async Kafka assertions." },
+  { cat: "micro", type: "project", q: "Why does OrderControllerTest use @MockBean for InventoryGrpcClient?", a: "In test, there's no real Inventory Service running. The gRPC client would fail to connect. @MockBean replaces it with a mock that returns controlled responses, so we can test the Order Service in isolation.", project: null },
+
+  // General interview
+  { cat: "micro", type: "general", q: "What does 'AI-first development' mean in practice?", a: "Using AI tools (like Claude Code) throughout the development lifecycle: architecture design, implementation planning, code generation with TDD, debugging, documentation, and code review. AI accelerates delivery while the developer maintains design ownership.", project: "This entire project was built with Claude Code using subagent-driven development: plan, implement per task, two-stage review." },
+
+  // AI-First / Spec Kit
+  { cat: "ai", type: "general", q: "What is Spec-Driven Development?", a: "A methodology where specifications become executable artifacts that directly generate working implementations. You define WHAT and WHY first, then AI handles the HOW.", project: null },
+  { cat: "ai", type: "general", q: "What are the 6 steps in the Spec Kit workflow?", a: "1) Initialize project, 2) Constitution (governing principles), 3) Specify (what + why), 4) Plan (tech stack + architecture), 5) Tasks (actionable steps), 6) Implement (AI executes tasks)", project: null },
+  { cat: "ai", type: "general", q: "What is a Spec Kit constitution?", a: "Non-negotiable governing principles for the project — like engineering standards that every implementation must follow. Example: 'All services must expose health check endpoints.'", project: null },
+  { cat: "ai", type: "general", q: "What problem does Spec Kit solve compared to direct AI prompting?", a: "It prevents context loss between prompts, scope creep, inconsistent architecture decisions, and endless rework loops by giving the AI structured specifications to follow.", project: null },
+  { cat: "ai", type: "general", q: "What is the key insight of AI-First Development?", a: "The most valuable skill shifts from writing code to writing clear specifications. Developers specify WHAT to build; AI handles HOW to build it.", project: null },
+  { cat: "ai", type: "project", q: "What would the Spec Kit constitution include for our marketplace platform?", a: "Event-driven communication via Kafka for state changes, gRPC only for read operations, each service owns its database, all endpoints observable via Actuator + Micrometer, virtual threads for blocking I/O, optimistic locking for concurrent modifications.", project: null },
+  { cat: "ai", type: "general", q: "What AI coding agents does Spec Kit support?", a: "20+ agents including Claude Code, GitHub Copilot, Cursor, Windsurf, Google Gemini, Mistral Vibe, Qwen Code, and more. Use --ai generic for unsupported agents.", project: null },
+  { cat: "ai", type: "general", q: "What is the difference between /speckit.specify and /speckit.plan?", a: "/speckit.specify defines WHAT you're building and WHY (user perspective, no tech details). /speckit.plan defines HOW — tech stack, architecture, and implementation approach.", project: null },
+];
+
+// ============ FLASHCARD LOGIC ============
+let filteredCards = [...allCards];
+let currentCard = 0;
+
+function renderCard() {
+  const card = filteredCards[currentCard];
+  const catLabels = { vt: "Virtual Threads", kafka: "Kafka", grpc: "gRPC", db: "Databases", micro: "Architecture", ai: "AI-First / Spec Kit" };
+  const catColors = { vt: "background:#e8f5e9;color:#2e7d32", kafka: "background:#fce4ec;color:#c62828", grpc: "background:#f3e5f5;color:#6a1b9a", db: "background:#fff3e0;color:#e65100", micro: "background:#e3f2fd;color:#1565c0", ai: "background:#e0f2f1;color:#00695c" };
+
+  document.getElementById('fc-category').textContent = (catLabels[card.cat] || card.cat).toUpperCase() + (card.type === 'project' ? ' (PROJECT)' : '');
+  document.getElementById('fc-category').style = catColors[card.cat] || '';
+  document.getElementById('fc-question').textContent = card.q;
+  document.getElementById('fc-answer').textContent = card.a;
+
+  const projNote = document.getElementById('fc-project');
+  const projText = document.getElementById('fc-project-text');
+  if (card.project) {
+    projNote.style.display = 'block';
+    projText.textContent = card.project;
+  } else {
+    projNote.style.display = 'none';
+  }
+
+  document.getElementById('fc-counter').textContent = `${currentCard + 1} / ${filteredCards.length}`;
+  document.getElementById('fc-prev').disabled = currentCard === 0;
+  document.getElementById('fc-next').disabled = currentCard === filteredCards.length - 1;
+
+  // Reset flip
+  document.querySelector('.flashcard').classList.remove('flipped');
+}
+
+function flipCard() { document.querySelector('.flashcard').classList.toggle('flipped'); }
+function nextCard() { if (currentCard < filteredCards.length - 1) { currentCard++; renderCard(); } }
+function prevCard() { if (currentCard > 0) { currentCard--; renderCard(); } }
+
+function filterCards(filter, btn) {
+  document.querySelectorAll('#flashcards .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (filter === 'all') filteredCards = [...allCards];
+  else if (filter === 'general') filteredCards = allCards.filter(c => c.type === 'general');
+  else if (filter === 'project') filteredCards = allCards.filter(c => c.type === 'project');
+  else filteredCards = allCards.filter(c => c.cat === filter);
+  currentCard = 0;
+  renderCard();
+}
+
+function shuffleCards() {
+  for (let i = filteredCards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [filteredCards[i], filteredCards[j]] = [filteredCards[j], filteredCards[i]];
+  }
+  currentCard = 0;
+  renderCard();
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  if (document.getElementById('flashcards').classList.contains('active')) {
+    if (e.key === 'ArrowRight') nextCard();
+    else if (e.key === 'ArrowLeft') prevCard();
+    else if (e.key === ' ') { e.preventDefault(); flipCard(); }
+  }
+});
+
+// ============ QUIZ DATA ============
+const quizQuestions = [
+  // General
+  { type: "general", q: "What is the main advantage of virtual threads over platform threads?", opts: ["They run code faster", "They use less memory and don't block carrier threads during I/O waits", "They bypass the operating system completely", "They automatically parallelize sequential code"], correct: 1, exp: "Virtual threads are ~1KB (vs ~1MB for platform threads) and park during blocking I/O, freeing the carrier thread to serve other virtual threads. They don't make code faster — they allow more concurrent requests." },
+  { type: "general", q: "In Kafka, what determines which partition a message goes to?", opts: ["The topic name", "Round-robin assignment", "The message key (hashed)", "The consumer group"], correct: 2, exp: "Kafka hashes the message key to determine the partition: hash(key) % numPartitions. If no key is provided, messages are distributed round-robin. Using a consistent key (like orderId) ensures ordering." },
+  { type: "general", q: "What protocol does gRPC use for data serialization?", opts: ["JSON", "XML", "Protocol Buffers (protobuf)", "MessagePack"], correct: 2, exp: "gRPC uses Protocol Buffers — a binary serialization format. It's more compact and faster to parse than JSON. The schema is defined in .proto files." },
+  { type: "general", q: "What does ACID stand for in database transactions?", opts: ["Asynchronous, Concurrent, Isolated, Distributed", "Atomicity, Consistency, Isolation, Durability", "Automated, Cached, Indexed, Durable", "Atomic, Consistent, Integrated, Decoupled"], correct: 1, exp: "Atomicity (all or nothing), Consistency (valid state), Isolation (concurrent transactions don't interfere), Durability (committed data survives crashes)." },
+  { type: "general", q: "What is the purpose of a Kafka consumer group?", opts: ["To batch messages for efficiency", "To ensure each partition is processed by exactly one consumer in the group", "To encrypt messages in transit", "To compress messages before sending"], correct: 1, exp: "Consumer groups enable parallel processing. Each partition is assigned to one consumer in the group, so messages are never processed twice. Adding consumers scales processing up to the number of partitions." },
+  { type: "general", q: "What is optimistic locking?", opts: ["Locking a database row before reading it", "Using a version field to detect concurrent modifications, retrying on conflict", "Preventing all concurrent access to a table", "Locking a record for the duration of an HTTP request"], correct: 1, exp: "Optimistic locking doesn't hold locks. Instead, it reads a version, does work, then checks the version before saving. If it changed, someone else modified it — retry with fresh data." },
+  { type: "general", q: "Why would you choose gRPC over REST for inter-service communication?", opts: ["gRPC is easier to test with curl", "gRPC uses binary serialization and HTTP/2, making it faster for internal calls", "gRPC supports more HTTP methods", "gRPC automatically handles authentication"], correct: 1, exp: "gRPC's binary serialization (protobuf) is smaller and faster than JSON. HTTP/2 enables multiplexing. The typed .proto contract provides compile-time safety. REST is better for external/public APIs." },
+  { type: "general", q: "What is polyglot persistence?", opts: ["Storing data in multiple languages", "Using different database technologies for different services based on their needs", "Replicating data across databases", "Converting data between formats"], correct: 1, exp: "Polyglot persistence means choosing the right database for each job. Relational for transactional data, document stores for flexible schemas, etc. Each service picks what fits best." },
+  { type: "general", q: "What does KRaft mode in Kafka eliminate?", opts: ["The need for partitions", "The Zookeeper dependency", "The producer/consumer model", "Message persistence"], correct: 1, exp: "KRaft (Kafka Raft) is Kafka's built-in consensus mechanism. It replaces Zookeeper, which was previously required for cluster coordination. Simpler to operate — one system instead of two." },
+  { type: "general", q: "When do virtual threads NOT improve performance?", opts: ["When making HTTP calls", "When querying databases", "When doing CPU-intensive work like image processing", "When reading files"], correct: 2, exp: "Virtual threads help with I/O-bound work (waiting for network/disk). For CPU-bound work, the thread is actually computing, not waiting — so virtual vs platform threads perform the same." },
+  { type: "general", q: "What is event-driven architecture?", opts: ["Using cron jobs to process data", "Services communicate by publishing and consuming events about what happened", "Triggering functions on button clicks", "Real-time streaming of video data"], correct: 1, exp: "Services publish events (facts about what happened) without knowing who consumes them. Other services react to events they care about. This enables loose coupling and easy extensibility." },
+  { type: "general", q: "What does @Transactional do in Spring?", opts: ["Makes the method run faster", "Wraps the method in a database transaction — all DB operations succeed or all are rolled back", "Prevents the method from being called concurrently", "Caches the method's return value"], correct: 1, exp: "Spring creates a database transaction before the method runs and commits it after. If any exception is thrown, all changes are rolled back. Ensures data consistency." },
+  { type: "general", q: "What is Testcontainers?", opts: ["A Docker image repository", "A library that spins up real Docker containers for integration tests", "A container orchestration tool", "A way to mock Docker containers"], correct: 1, exp: "Testcontainers starts real database and broker containers during tests. Tests hit real infrastructure instead of mocks, catching bugs that mocks would miss. Containers are cleaned up automatically." },
+
+  // Project-specific
+  { type: "project", q: "In the Marketplace Platform, what happens first when a customer places an order?", opts: ["The order is saved to PostgreSQL", "An OrderPlacedEvent is sent to Kafka", "The Order Service checks stock via gRPC to the Inventory Service", "The frontend polls for status updates"], correct: 2, exp: "The Order Service first calls the Inventory Service via gRPC (CheckStock) to verify stock availability. Only if stock is available does it save the order and then reserve stock." },
+  { type: "project", q: "Why does the Order Service use BOTH gRPC and Kafka to communicate with the Inventory Service?", opts: ["They serve different purposes — gRPC for synchronous checks, Kafka for async confirmation", "It's redundant for reliability", "gRPC handles reads, Kafka handles writes", "Kafka is used as a fallback when gRPC fails"], correct: 0, exp: "gRPC is used for synchronous calls where the customer is waiting (stock check, reservation). Kafka is used for async flows where no one is waiting (order confirmation, stock release on cancel)." },
+  { type: "project", q: "What status does an order have immediately after being placed?", opts: ["CONFIRMED", "PENDING", "PROCESSING", "CREATED"], correct: 1, exp: "Orders start as PENDING. They transition to CONFIRMED after the Inventory Service confirms the stock reservation via a StockUpdatedEvent through Kafka. This happens asynchronously in 1-3 seconds." },
+  { type: "project", q: "Which orders can be cancelled in the Marketplace Platform?", opts: ["Only PENDING orders", "PENDING and CONFIRMED orders", "Any order except SHIPPED", "All orders at any time"], correct: 1, exp: "Only PENDING and CONFIRMED orders can be cancelled. SHIPPED, REJECTED, and already CANCELLED orders cannot be cancelled. The system throws IllegalStateException with a 409 Conflict response." },
+  { type: "project", q: "What happens to reserved stock when an order is cancelled?", opts: ["It's lost forever", "An OrderCancelledEvent is published to Kafka, and the Inventory Service releases the stock", "The admin must manually release it", "PostgreSQL triggers release the stock"], correct: 1, exp: "The Order Service publishes an OrderCancelledEvent to the order-events Kafka topic. The Inventory Service consumes it and releases the reserved stock (reservedStock -= quantity)." },
+  { type: "project", q: "Why does the Product entity have a @Version field?", opts: ["To track product revisions", "To implement optimistic locking for concurrent stock updates", "To support API versioning", "To enable database migrations"], correct: 1, exp: "When two orders try to reserve the same product simultaneously, @Version prevents lost updates. The second save detects the version mismatch and retries with fresh data." },
+  { type: "project", q: "What does the @EntityGraph annotation solve in the Order Service?", opts: ["Database indexing", "The N+1 query problem and LazyInitializationException when listing orders", "Caching query results", "Cross-database joins"], correct: 1, exp: "@EntityGraph(attributePaths = 'items') on findAll tells JPA to eagerly load order items in a single JOIN query. Without it, accessing items after the transaction closes throws LazyInitializationException." },
+  { type: "project", q: "How does the frontend know when an order status changes from PENDING to CONFIRMED?", opts: ["WebSocket push notification", "Server-Sent Events", "Polling — the frontend calls GET /api/orders/{id} every 3 seconds", "The backend redirects to a new URL"], correct: 2, exp: "The frontend polls the Order Service every 3 seconds. When the Kafka async flow completes and the status changes, the next poll picks up the new status and updates the UI." },
+  { type: "project", q: "What HTTP status code is returned when a customer tries to order a product with insufficient stock?", opts: ["400 Bad Request", "404 Not Found", "422 Unprocessable Entity", "500 Internal Server Error"], correct: 2, exp: "422 Unprocessable Entity is returned because the request was syntactically valid but couldn't be processed due to a business rule (not enough stock). This is handled by the InsufficientStockException handler." },
+  { type: "project", q: "How many Kafka partitions does each topic have, and why?", opts: ["1 partition for simplicity", "3 partitions for parallel processing", "10 partitions for maximum throughput", "It varies per topic"], correct: 1, exp: "Both topics have 3 partitions. This allows up to 3 consumers to process messages in parallel. In production, you'd typically match partitions to the expected number of service instances." },
+  { type: "project", q: "What metrics does the Order Service track?", opts: ["CPU and memory usage only", "orders.created.total (Counter), orders.rejected.total (Counter), orders.creation.duration (Timer)", "Request count per endpoint", "Database query times"], correct: 1, exp: "Three custom Micrometer metrics: two Counters for orders created and rejected, one Timer for order creation duration. These are exposed at /actuator/prometheus for monitoring tools." },
+  { type: "project", q: "What is the gRPC BOM and why was it added to the parent POM?", opts: ["Bill of Materials — ensures all gRPC dependencies use the same version (1.64.0) to prevent class conflicts", "A build optimization module", "A binary object model for protobuf", "A backward compatibility module"], correct: 0, exp: "grpc-spring-boot-starter pulled in gRPC 1.63.0 for core/netty, but our explicit deps used 1.64.0 for protobuf/stub. The BOM forces all gRPC jars to 1.64.0, fixing the InternalGlobalInterceptors class not found error." },
+
+  // AI-First / Spec Kit
+  { type: "general", q: "What is the correct order of the Spec Kit workflow?", opts: ["Specify → Plan → Constitution → Tasks → Implement", "Constitution → Specify → Plan → Tasks → Implement", "Plan → Specify → Tasks → Constitution → Implement", "Tasks → Constitution → Plan → Specify → Implement"], correct: 1, exp: "The constitution (governing principles) comes first, then specification (what+why), planning (how), task breakdown, and finally implementation." },
+  { type: "general", q: "In AI-First Development, what is the developer's primary role?", opts: ["Writing production code", "Writing clear specifications", "Reviewing AI-generated tests", "Managing deployment pipelines"], correct: 1, exp: "The key insight of AI-First Development is that the developer's most valuable skill shifts from writing code to writing clear specifications that guide AI implementation." },
+  { type: "project", q: "If our marketplace platform used Spec Kit, which principle would belong in the constitution?", opts: ["Use React for the frontend", "Orders should have a PENDING status", "Each service must own its database — no shared databases", "The admin dashboard should show order counts"], correct: 2, exp: "A constitution contains non-negotiable engineering principles. 'Each service owns its database' is an architectural principle, while the others are implementation details or feature requirements." },
+];
+
+// ============ QUIZ LOGIC ============
+let quizState = {};
+let activeQuizFilter = 'all';
+
+function getFilteredQuestions() {
+  if (activeQuizFilter === 'all') return quizQuestions;
+  return quizQuestions.filter(q => q.type === activeQuizFilter);
+}
+
+function renderQuiz() {
+  const container = document.getElementById('quiz-container');
+  const questions = getFilteredQuestions();
+  container.innerHTML = '';
+
+  questions.forEach((q, i) => {
+    const globalIdx = quizQuestions.indexOf(q);
+    const state = quizState[globalIdx];
+    const answered = state !== undefined;
+
+    let html = `<div class="quiz-card" id="quiz-${globalIdx}">
+      <p class="question"><span class="q-number">${i+1}</span>&nbsp; ${q.q}
+        <span style="font-size:11px;color:${q.type==='project'?'#1565c0':'#888'};margin-left:8px;font-weight:400">${q.type==='project'?'PROJECT':'GENERAL'}</span>
+      </p>
+      <div class="quiz-options">`;
+
+    q.opts.forEach((opt, oi) => {
+      let cls = 'quiz-opt';
+      if (answered) {
+        if (oi === q.correct) cls += ' correct';
+        else if (oi === state && state !== q.correct) cls += ' wrong';
+      }
+      if (answered && oi === state) cls += ' selected';
+      html += `<button class="${cls}" ${answered ? 'disabled' : ''} onclick="answerQuiz(${globalIdx}, ${oi})">${opt}</button>`;
+    });
+
+    html += '</div>';
+
+    if (answered) {
+      const isCorrect = state === q.correct;
+      html += `<div class="quiz-explanation show ${isCorrect ? 'correct-exp' : 'wrong-exp'}">${isCorrect ? '&#10003; Correct!' : '&#10007; Incorrect.'} ${q.exp}</div>`;
+    }
+
+    html += '</div>';
+    container.innerHTML += html;
+  });
+
+  updateScore();
+}
+
+function answerQuiz(idx, choice) {
+  quizState[idx] = choice;
+  renderQuiz();
+  // Scroll to next unanswered
+  const questions = getFilteredQuestions();
+  const nextUnanswered = questions.find(q => quizState[quizQuestions.indexOf(q)] === undefined);
+  if (nextUnanswered) {
+    const nextIdx = quizQuestions.indexOf(nextUnanswered);
+    setTimeout(() => document.getElementById(`quiz-${nextIdx}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+  }
+}
+
+function updateScore() {
+  const questions = getFilteredQuestions();
+  const answered = questions.filter(q => quizState[quizQuestions.indexOf(q)] !== undefined);
+  const correct = answered.filter(q => quizState[quizQuestions.indexOf(q)] === q.correct);
+  document.getElementById('score-display').textContent = `${correct.length} / ${questions.length}`;
+}
+
+function resetQuiz() {
+  quizState = {};
+  renderQuiz();
+}
+
+function filterQuiz(filter, btn) {
+  document.querySelectorAll('#quiz .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeQuizFilter = filter;
+  renderQuiz();
+}
+
+// ============ INIT ============
+renderCard();
+renderQuiz();
+</script>
+</body>
+</html>

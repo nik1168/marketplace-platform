@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Niklaus Geisser — Introduction</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    overflow: hidden;
+    height: 100vh;
+  }
+
+  .slide {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 60px 80px;
+    text-align: center;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .slide.active { display: flex; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  h1 {
+    font-size: 3.2rem;
+    font-weight: 700;
+    color: #f8fafc;
+    margin-bottom: 16px;
+    line-height: 1.2;
+  }
+
+  h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #38bdf8;
+    margin-bottom: 32px;
+  }
+
+  .subtitle {
+    font-size: 1.4rem;
+    color: #94a3b8;
+    margin-bottom: 40px;
+  }
+
+  .highlight { color: #38bdf8; }
+  .highlight-green { color: #4ade80; }
+  .highlight-amber { color: #fbbf24; }
+
+  .content {
+    max-width: 900px;
+    text-align: left;
+    width: 100%;
+  }
+
+  .content li {
+    font-size: 1.3rem;
+    line-height: 1.8;
+    margin-bottom: 12px;
+    list-style: none;
+    padding-left: 28px;
+    position: relative;
+  }
+
+  .content li::before {
+    content: '>';
+    position: absolute;
+    left: 0;
+    color: #38bdf8;
+    font-weight: 700;
+  }
+
+  .timeline {
+    max-width: 800px;
+    width: 100%;
+    text-align: left;
+  }
+
+  .timeline-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 24px;
+    gap: 20px;
+  }
+
+  .timeline-year {
+    font-size: 1rem;
+    color: #38bdf8;
+    font-weight: 700;
+    min-width: 110px;
+    padding-top: 2px;
+  }
+
+  .timeline-content {
+    flex: 1;
+  }
+
+  .timeline-role {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #f8fafc;
+  }
+
+  .timeline-company {
+    font-size: 1rem;
+    color: #94a3b8;
+  }
+
+  .timeline-dot {
+    width: 12px;
+    height: 12px;
+    background: #38bdf8;
+    border-radius: 50%;
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 850px;
+    width: 100%;
+  }
+
+  .tech-item {
+    background: rgba(56, 189, 248, 0.08);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .tech-item .label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #f8fafc;
+    margin-bottom: 4px;
+  }
+
+  .tech-item .detail {
+    font-size: 0.9rem;
+    color: #94a3b8;
+  }
+
+  .project-box {
+    background: rgba(74, 222, 128, 0.06);
+    border: 1px solid rgba(74, 222, 128, 0.2);
+    border-radius: 16px;
+    padding: 36px 40px;
+    max-width: 850px;
+    width: 100%;
+    text-align: left;
+  }
+
+  .project-box h3 {
+    font-size: 1.4rem;
+    color: #4ade80;
+    margin-bottom: 20px;
+  }
+
+  .project-box li {
+    font-size: 1.15rem;
+    line-height: 1.7;
+    margin-bottom: 8px;
+    list-style: none;
+    padding-left: 24px;
+    position: relative;
+  }
+
+  .project-box li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: #4ade80;
+    font-weight: 700;
+  }
+
+  .badge {
+    display: inline-block;
+    background: rgba(56, 189, 248, 0.15);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    color: #38bdf8;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin: 4px;
+  }
+
+  .badge.green {
+    background: rgba(74, 222, 128, 0.12);
+    border-color: rgba(74, 222, 128, 0.3);
+    color: #4ade80;
+  }
+
+  .badge.amber {
+    background: rgba(251, 191, 36, 0.12);
+    border-color: rgba(251, 191, 36, 0.3);
+    color: #fbbf24;
+  }
+
+  .badges-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    max-width: 700px;
+    margin-top: 12px;
+  }
+
+  .quote {
+    font-size: 1.6rem;
+    font-style: italic;
+    color: #94a3b8;
+    max-width: 700px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  /* Navigation */
+  .nav {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    z-index: 10;
+  }
+
+  .nav button {
+    background: rgba(56, 189, 248, 0.15);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    color: #38bdf8;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .nav button:hover {
+    background: rgba(56, 189, 248, 0.25);
+  }
+
+  .nav button:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  .slide-count {
+    color: #64748b;
+    font-size: 0.9rem;
+    min-width: 60px;
+    text-align: center;
+  }
+
+  /* Progress bar */
+  .progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: #38bdf8;
+    transition: width 0.3s ease;
+    z-index: 10;
+  }
+
+  .achievement {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 20px;
+    max-width: 800px;
+    text-align: left;
+  }
+
+  .achievement-icon {
+    font-size: 1.6rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .achievement-text {
+    font-size: 1.15rem;
+    line-height: 1.6;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    max-width: 900px;
+    width: 100%;
+    text-align: left;
+  }
+
+  .col-box {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 28px;
+  }
+
+  .col-box h3 {
+    font-size: 1.2rem;
+    color: #38bdf8;
+    margin-bottom: 16px;
+  }
+
+  .col-box li {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin-bottom: 6px;
+    list-style: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<!-- Slide 1: Title -->
+<div class="slide active" id="slide-1">
+  <h1>Niklaus Geisser</h1>
+  <p class="subtitle">Full Stack Engineer &middot; AI-First Developer</p>
+  <div class="badges-wrap">
+    <span class="badge">8+ Years Experience</span>
+    <span class="badge green">MSc Computer Science</span>
+    <span class="badge amber">La Paz, Bolivia</span>
+  </div>
+</div>
+
+<!-- Slide 2: About Me -->
+<div class="slide" id="slide-2">
+  <h2>About Me</h2>
+  <ul class="content">
+    <li><span class="highlight">8+ years</span> building scalable web and mobile applications</li>
+    <li><span class="highlight">MSc in Computer Science</span> (Machine Learning & Algorithms) from Universit&eacute; libre de Bruxelles, Belgium</li>
+    <li>Currently at <span class="highlight">Arctic Wolf</span> — integrating LLM capabilities into enterprise cybersecurity platforms</li>
+    <li>Domains: <span class="highlight-green">Fintech</span>, <span class="highlight-green">Cybersecurity</span>, <span class="highlight-green">Social Networking</span>, <span class="highlight-green">IoT</span></li>
+  </ul>
+</div>
+
+<!-- Slide 3: Career Journey -->
+<div class="slide" id="slide-3">
+  <h2>Career Journey</h2>
+  <div class="timeline">
+    <div class="timeline-item">
+      <span class="timeline-year">2020 &ndash; Present</span>
+      <div class="timeline-dot"></div>
+      <div class="timeline-content">
+        <div class="timeline-role">Full Stack Engineer</div>
+        <div class="timeline-company">Arctic Wolf &middot; Minnesota, USA (Remote)</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <span class="timeline-year">2020 &ndash; 2021</span>
+      <div class="timeline-dot"></div>
+      <div class="timeline-content">
+        <div class="timeline-role">Software Engineer</div>
+        <div class="timeline-company">Aaqua &middot; Antwerp, Belgium</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <span class="timeline-year">2020</span>
+      <div class="timeline-dot"></div>
+      <div class="timeline-content">
+        <div class="timeline-role">Full Stack Engineer</div>
+        <div class="timeline-company">Sentiance &middot; Antwerp, Belgium</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <span class="timeline-year">2018 &ndash; 2020</span>
+      <div class="timeline-dot"></div>
+      <div class="timeline-content">
+        <div class="timeline-role">MSc Computer Science</div>
+        <div class="timeline-company">Universit&eacute; libre de Bruxelles &middot; Belgium</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <span class="timeline-year">2016 &ndash; 2018</span>
+      <div class="timeline-dot"></div>
+      <div class="timeline-content">
+        <div class="timeline-role">Software Engineer</div>
+        <div class="timeline-company">Mojix &middot; La Paz, Bolivia</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <span class="timeline-year">2015 &ndash; 2016</span>
+      <div class="timeline-dot"></div>
+      <div class="timeline-content">
+        <div class="timeline-role">Software Engineer (R&D)</div>
+        <div class="timeline-company">Universidad Cat&oacute;lica Boliviana &middot; La Paz</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 4: Technical Skills -->
+<div class="slide" id="slide-4">
+  <h2>Technical Skills</h2>
+  <div class="tech-grid">
+    <div class="tech-item">
+      <div class="label">TypeScript / React</div>
+      <div class="detail">Frontend & React Native</div>
+    </div>
+    <div class="tech-item">
+      <div class="label">Java / Spring Boot</div>
+      <div class="detail">Backend services</div>
+    </div>
+    <div class="tech-item">
+      <div class="label">Python</div>
+      <div class="detail">ML & scripting</div>
+    </div>
+    <div class="tech-item">
+      <div class="label">AI / LLM Integration</div>
+      <div class="detail">Enterprise AI workflows</div>
+    </div>
+    <div class="tech-item">
+      <div class="label">GraphQL & REST</div>
+      <div class="detail">API design</div>
+    </div>
+    <div class="tech-item">
+      <div class="label">Machine Learning</div>
+      <div class="detail">MSc specialization</div>
+    </div>
+  </div>
+  <div class="badges-wrap" style="margin-top:28px;">
+    <span class="badge">Node.js</span>
+    <span class="badge">SQL</span>
+    <span class="badge">React Native</span>
+    <span class="badge">gRPC</span>
+    <span class="badge">Kafka</span>
+    <span class="badge">Docker</span>
+    <span class="badge">MongoDB</span>
+    <span class="badge">PostgreSQL</span>
+    <span class="badge green">QA Automation</span>
+    <span class="badge green">IoT</span>
+  </div>
+</div>
+
+<!-- Slide 5: What I Do at Arctic Wolf -->
+<div class="slide" id="slide-5">
+  <h2>What I Do at Arctic Wolf</h2>
+  <ul class="content">
+    <li>Lead <span class="highlight">AI-first development</span> — integrating LLMs into enterprise cybersecurity workflows</li>
+    <li>Build and maintain <span class="highlight">React/TypeScript</span> frontends for security operations</li>
+    <li>Develop <span class="highlight">Java/Spring Boot</span> backend services at enterprise scale</li>
+    <li>Collaborate cross-functionally with product, design, and security research teams</li>
+  </ul>
+  <div style="margin-top: 32px;">
+    <span class="badge amber">4+ years</span>
+    <span class="badge">Full Stack</span>
+    <span class="badge green">AI-First</span>
+  </div>
+</div>
+
+<!-- Slide 6: Achievements -->
+<div class="slide" id="slide-6">
+  <h2>Achievements</h2>
+  <div style="max-width: 800px;">
+    <div class="achievement">
+      <span class="achievement-icon">&#127942;</span>
+      <span class="achievement-text"><span class="highlight-amber">Full scholarship</span> from the Simon I. Pati&ntilde;o Foundation to pursue MSc in Belgium — a highly selective grant recognizing academic excellence</span>
+    </div>
+    <div class="achievement">
+      <span class="achievement-icon">&#127941;</span>
+      <span class="achievement-text"><span class="highlight-amber">Second-highest GPA</span> across the entire Computer Science faculty in the Bachelor's program</span>
+    </div>
+    <div class="achievement">
+      <span class="achievement-icon">&#128218;</span>
+      <span class="achievement-text"><span class="highlight">MSc Computer Science</span> — Machine Learning & Algorithms, Universit&eacute; libre de Bruxelles</span>
+    </div>
+    <div class="achievement">
+      <span class="achievement-icon">&#9729;&#65039;</span>
+      <span class="achievement-text"><span class="highlight-green">AWS Certified AI Practitioner</span> (in progress)</span>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 7: Why This Role -->
+<div class="slide" id="slide-7">
+  <h2>Why This Role?</h2>
+  <div class="two-col">
+    <div class="col-box">
+      <h3>What I Bring</h3>
+      <ul>
+        <li>> Java/Spring Boot production experience</li>
+        <li>> AI/LLM integration at enterprise scale</li>
+        <li>> Full stack — frontend to infrastructure</li>
+        <li>> ML background (MSc)</li>
+        <li>> International experience (Belgium, USA)</li>
+      </ul>
+    </div>
+    <div class="col-box">
+      <h3>What Excites Me</h3>
+      <ul>
+        <li>> AI-first development methodology</li>
+        <li>> Building with Kafka, gRPC, microservices</li>
+        <li>> Spec-driven development practices</li>
+        <li>> Working locally in Bolivia again</li>
+        <li>> Solving complex distributed problems</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 8: Portfolio Project -->
+<div class="slide" id="slide-8">
+  <h2>Marketplace Platform</h2>
+  <p class="subtitle" style="margin-bottom: 28px;">A microservices project demonstrating the technologies for this role</p>
+  <div class="project-box">
+    <h3>What I Built</h3>
+    <ul>
+      <li><span class="highlight">Java 21</span> with Virtual Threads for high-throughput concurrency</li>
+      <li><span class="highlight">Spring Boot</span> microservices with layered architecture</li>
+      <li><span class="highlight">gRPC</span> for synchronous inter-service communication</li>
+      <li><span class="highlight">Apache Kafka</span> for async event-driven order confirmation</li>
+      <li><span class="highlight-green">PostgreSQL + MongoDB</span> — polyglot persistence</li>
+      <li>Optimistic locking, Saga pattern, observability with Micrometer</li>
+      <li>React + TypeScript admin dashboard</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Slide 9: Thank You -->
+<div class="slide" id="slide-9">
+  <h1>Thank You</h1>
+  <p class="subtitle" style="margin-bottom: 32px;">Let's build something great together.</p>
+  <div style="color: #64748b; font-size: 1rem; line-height: 2;">
+    <div>ngeisser32@gmail.com</div>
+    <div>github.com/nik1168</div>
+    <div>linkedin.com/in/niklaus-jeff-geisser-aguilar</div>
+  </div>
+</div>
+
+<!-- Navigation -->
+<div class="nav">
+  <button id="prev" onclick="navigate(-1)">&larr; Prev</button>
+  <span class="slide-count" id="counter">1 / 9</span>
+  <button id="next" onclick="navigate(1)">Next &rarr;</button>
+</div>
+
+<script>
+  let current = 0;
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+
+  function show(index) {
+    slides.forEach(s => s.classList.remove('active'));
+    slides[index].classList.add('active');
+    document.getElementById('counter').textContent = (index + 1) + ' / ' + total;
+    document.getElementById('prev').disabled = index === 0;
+    document.getElementById('next').disabled = index === total - 1;
+    document.getElementById('progress').style.width = ((index + 1) / total * 100) + '%';
+  }
+
+  function navigate(dir) {
+    const next = current + dir;
+    if (next >= 0 && next < total) { current = next; show(current); }
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); navigate(1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); navigate(-1); }
+  });
+
+  show(0);
+</script>
+</body>
+</html>
