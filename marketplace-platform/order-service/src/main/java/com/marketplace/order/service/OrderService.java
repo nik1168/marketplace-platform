@@ -57,10 +57,8 @@ public class OrderService {
             );
             Order saved = orderRepository.save(order);
 
-            for (var item : request.items()) {
-                inventoryClient.reserveStock(item.productId(), item.quantity(), saved.getId().toString());
-            }
-
+            // Stock reservation happens asynchronously via Kafka — the Inventory Service
+            // reserves stock when it consumes the OrderPlaced event, then confirms via StockUpdated
             eventProducer.publishOrderPlaced(saved);
             ordersCreatedCounter.increment();
             return saved;
